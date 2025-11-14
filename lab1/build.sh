@@ -23,9 +23,7 @@ TmpDir=$(mktemp -d)
 Path=$(pwd)
 
 cleanup() {
-    rc=$?
     rm -rf "$TmpDir"
-    exit $rc
 }
 
 trap cleanup EXIT HUP INT QUIT PIPE TERM
