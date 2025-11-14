@@ -26,7 +26,7 @@ cleanup() {
     rm -rf "$TmpDir"
 }
 
-trap cleanup EXIT HUP INT QUIT PIPE TERM
+trap cleanup EXIT HUP INT PIPE TERM
 echo "Building in temporary directory: $TmpDir"
 cp "$File" "$TmpDir/"
 cd "$TmpDir"
