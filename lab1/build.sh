@@ -12,7 +12,7 @@ if [ ! -f "$File" ]; then
     exit 2
 fi
 
-Output=$(grep '&Output:' "$File" | cut -d: -f2- | xargs || true)
+Output=$(grep '&Output:' "$File" | cut -d: -f2- | xargs)
 
 if [ -z "$Output" ]; then
     echo "Error: &Output: not found in file"
