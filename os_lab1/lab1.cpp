@@ -51,7 +51,9 @@ public:
         while (true)
         {
             unique_lock<mutex> lock(mtx);
-            cv.wait(lock, [&] { return ready == 1 || finish; });
+            while (!(ready == 1 || finish)) {
+                cv.wait(lock);
+            }
 
             if (finish && !ready)
                 break;
@@ -76,3 +78,4 @@ int main() {
     cout << "Program finished." << endl;
     return 0;
 }
+
