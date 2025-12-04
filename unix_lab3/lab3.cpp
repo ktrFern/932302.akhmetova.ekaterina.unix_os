@@ -77,7 +77,7 @@ int main() {
 
                 filesystem::create_hard_link(original, currentFile);
                 cout << "Создана жёсткая ссылка: " << currentFile
-                     << " → " << original << endl;
+                     << ": " << original << endl;
             }
         } catch (std::exception& e) {
             cout << "Ошибка: " << e.what() << endl;
