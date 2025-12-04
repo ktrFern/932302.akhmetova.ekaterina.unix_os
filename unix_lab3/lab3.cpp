@@ -84,7 +84,7 @@ int main() {
         }
         cout << endl;
     }
-    cout << "\nОбработка завершена.\n";
+    cout << "\nОбработка завершена\n";
     cout << "Уникальных файлов: " << seenHashes.size() << endl;
     return 0;
 }
