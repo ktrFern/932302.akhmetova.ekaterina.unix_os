@@ -1,4 +1,3 @@
-#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -39,14 +38,10 @@ string computeSha1(const string &filePath) {
 
 void collectFiles(vector<string> &fileList, const string &rootDir) {
     for (const auto &entry : filesystem::directory_iterator(rootDir)) {
-        try {
-            if (filesystem::is_directory(entry)) {
-                collectFiles(fileList, entry.path().string());
-            } else if (filesystem::is_regular_file(entry)) {
-                fileList.push_back(entry.path().string());
-            }
-        } catch (const filesystem::filesystem_error &e) {
-            cout << "ОШИБКА: " << e.what() << endl;
+        if (filesystem::is_directory(entry)) {
+            collectFiles(fileList, entry.path().string());
+        } else if (filesystem::is_regular_file(entry)) {
+            fileList.push_back(entry.path().string());
         }
     }
 }
@@ -58,45 +53,38 @@ int main() {
     cout << "Всего найдено файлов в каталоге: " << allFiles.size() << "\n\n";
 
     for (const auto &currentFile : allFiles) {
-        try {
-            cout << "Обрабатываем файл: " << currentFile << endl;
-            string fileHash = computeSha1(currentFile);
+        cout << "Обрабатываем файл: " << currentFile << endl;
+        string fileHash = computeSha1(currentFile);
 
-            if (fileHash.empty()) {
-                cout << "Пропуск - хеш не получен\n";
+        if (fileHash.empty()) {
+            cout << "Пропуск - хеш не получен\n";
+            continue;
+        }
+
+        cout << "SHA1: " << fileHash << endl;
+        auto it = seenHashes.find(fileHash);
+
+        if (it == seenHashes.end()) {
+            seenHashes[fileHash] = filesystem::path(currentFile);
+            cout << "Файл уникален\n";
+        } 
+        else {
+            filesystem::path original = it->second;
+            cout << "Найден дубликат\n";
+            cout << "Оригинальный файл: " << original << endl;
+
+            if (filesystem::equivalent(original, currentFile)) {
+                cout << "Пропуск: файл уже является жёсткой ссылкой на оригинал.\n";
                 continue;
             }
-
-            cout << "SHA1: " << fileHash << endl;
-            auto it = seenHashes.find(fileHash);
-
-            if (it == seenHashes.end()) {
-                seenHashes[fileHash] = filesystem::path(currentFile);
-                cout << "Файл уникален\n";
-            } else {
-                filesystem::path original = it->second;
-                cout << "Найден дубликат\n";
-                cout << "Оригинальный файл: " << original << endl;
-
-                if (filesystem::equivalent(original, currentFile)) {
-                    cout << "Пропуск: файл уже является жёсткой ссылкой на оригинал.\n";
-                    continue;
-                }
-
-                cout << "Удаляем: " << currentFile << endl;
-                filesystem::remove(currentFile);
-                filesystem::create_hard_link(original, currentFile);
-                cout << "Создана жёсткая ссылка: " << currentFile << " -> " << original << "\n" << endl;
-            }
-
-            cout << endl;
-        } catch (const std::exception &e) {
-            cout << "ОШИБКА: " << e.what() << endl;
+            cout << "Удаляем: " << currentFile << endl;
+            filesystem::remove(currentFile);
+            filesystem::create_hard_link(original, currentFile);
+            cout << "Создана жёсткая ссылка: " << currentFile << " -> " << original << "\n" << endl;
         }
+        cout << endl;
     }
-
-    cout << "\n";
-    cout << "Обработка завершена.\n";
+    cout << "\nОбработка завершена.\n";
     cout << "Уникальных файлов: " << seenHashes.size() << endl;
     return 0;
 }
