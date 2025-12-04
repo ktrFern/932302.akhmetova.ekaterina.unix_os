@@ -18,13 +18,13 @@ void sigHupHandler(int) {
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        cerr << "Usage: " << argv[0] << " <port>" << endl;
+        cout << "Usage: " << argv[0] << " <port>" << endl;
         return EXIT_FAILURE;
     }
 
     int port = atoi(argv[1]);
     if (port <= 0 || port > 65535) {
-        cerr << "Invalid port: " << argv[1] << endl;
+        cout << "Invalid port: " << argv[1] << endl;
         return EXIT_FAILURE;
     }
 
