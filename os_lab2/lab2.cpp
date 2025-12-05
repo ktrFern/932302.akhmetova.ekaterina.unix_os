@@ -139,8 +139,6 @@ int main(int argc, char* argv[]) {
                 close(client_fd);
                 client_fd = -1;
             } else {
-                if (errno == EINTR) continue;
-                if (errno == EAGAIN || errno == EWOULDBLOCK) continue;
                 perror("recv");
                 close(client_fd);
                 client_fd = -1;
