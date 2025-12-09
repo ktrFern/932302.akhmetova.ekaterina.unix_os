@@ -5,6 +5,7 @@
 #include <linux/uaccess.h>
 #include <linux/time.h>
 #include <linux/seq_file.h>
+#include <linux/ktime.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Student TSU");
