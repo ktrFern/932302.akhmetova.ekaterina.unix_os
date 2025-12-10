@@ -19,11 +19,8 @@ while True:
         print(f"Sending email to {email} (task {task_id})...")
         print(f"Subject: {subject}")
         print(f"Body: {body}")
-
-        # Имитация отправки (например, 2 секунды)
         time.sleep(2)
 
-        # Сохраняем статус в Redis
         redis_client.setex(
             f'email_status:{task_id}',
             300,
