@@ -12,17 +12,26 @@ MODULE_DESCRIPTION("TSU module with Lunar New Year 2025 calculations");
 
 #define PROC_FILENAME "tsulab"
 
-#define LNY2025_START_YEAR 2025
-#define LNY2025_START_MONTH 1
-#define LNY2025_START_DAY 29
+#define LNY2025_START_YEAR   2025
+#define LNY2025_START_MONTH  1
+#define LNY2025_START_DAY    29
 
-#define LNY2025_END_YEAR 2025
-#define LNY2025_END_MONTH 2
-#define LNY2025_END_DAY 12
+#define LNY2025_END_YEAR     2025
+#define LNY2025_END_MONTH    2
+#define LNY2025_END_DAY      12
 
 static unsigned long calc_days_since(int year, int month, int day)
 {
-    time64_t event_time = mktime64(year, month, day, 0, 0, 0);
+    struct tm tm = {
+        .tm_year = year - 1900,
+        .tm_mon  = month - 1,
+        .tm_mday = day,
+        .tm_hour = 0,
+        .tm_min  = 0,
+        .tm_sec  = 0
+    };
+
+    time64_t event_time = mktime64(&tm);
     time64_t now = ktime_get_real_seconds();
 
     if (now < event_time)
@@ -34,18 +43,18 @@ static unsigned long calc_days_since(int year, int month, int day)
 static int proc_show(struct seq_file *m, void *v)
 {
     unsigned long days_since_start =
-        calc_days_since(LNY2025_START_YEAR, LNY2025_START_MONTH - 1, LNY2025_START_DAY);
+        calc_days_since(LNY2025_START_YEAR, LNY2025_START_MONTH, LNY2025_START_DAY);
 
     unsigned long days_since_end =
-        calc_days_since(LNY2025_END_YEAR, LNY2025_END_MONTH - 1, LNY2025_END_DAY);
-
-    pr_info("Days since Lunar New Year 2025 start: %lu, since Lunar New Year 2025 end: %lu\n",
-            days_since_start, days_since_end);
+        calc_days_since(LNY2025_END_YEAR, LNY2025_END_MONTH, LNY2025_END_DAY);
 
     seq_printf(m,
-               "Days since Lunar New Year 2025 start (29 Jan 2025): %lu\n"
-               "Days since Lunar New Year 2025 end (12 Feb 2025): %lu\n",
-               days_since_start, days_since_end);
+        "Days since Lunar New Year 2025 start (29 Jan 2025): %lu\n"
+        "Days since Lunar New Year 2025 end (12 Feb 2025): %lu\n",
+        days_since_start,
+        days_since_end
+    );
+
     return 0;
 }
 
@@ -76,7 +85,7 @@ static int __init tsu_init(void)
 
 static void __exit tsu_exit(void)
 {
-    remove_proc_entry(PROC_FILENAME, NULL);
+    proc_remove(proc_create(PROC_FILENAME, 0, NULL, &proc_file_ops));
     pr_info("Tomsk State University forever!\n");
 }
 
